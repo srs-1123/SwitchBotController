@@ -1,0 +1,58 @@
+@startuml ClassDiagram
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+' センサー基底クラスを追加したドメイン層のクラス図
+
+class Brightness {
+    - int lux
+    + Brightness(int lux)
+    + bool isDark(int threshold)
+    + int getLux()
+}
+
+interface BrightnessSensor {
+    + Brightness getBrightness() = 0
+}
+
+class VCNL4040Sensor {
+    - int i2cAddress
+    + VCNL4040Sensor(int i2cAddress)
+    + Brightness getBrightness() override
+}
+
+' ドメインサービス
+class LightControlService {
+    - int threshold
+    + LightControlService(int threshold)
+    + void autoLightControl(Brightness ambientLight)
+    - void turnOn()
+    - void turnOff()
+}
+
+' ユースケース
+class AutoLightControlUseCase {
+    + AutoLightControlUseCase()
+    + void execute(Brightness ambientLight)
+}
+
+' 出力ポート（ライト制御）インターフェース
+interface LightControlPort {
+    + void turnOn()
+    + void turnOff()
+}
+
+' インフラ層のライト制御実装（例: 実際のハードウェア制御）
+class LightControlAdapter {
+    + void turnOn()
+    + void turnOff()
+}
+
+' 関係性
+AutoLightControlUseCase --> LightControlService : uses
+AutoLightControlUseCase --> BrightnessSensor : interacts
+LightControlService --> LightControlPort : uses
+VCNL4040Sensor --|> BrightnessSensor
+LightControlAdapter --|> LightControlPort : implements
+
+@enduml
