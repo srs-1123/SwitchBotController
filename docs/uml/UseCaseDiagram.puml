@@ -1,0 +1,46 @@
+@startuml UseCaseDiagram
+left to right direction
+skinparam actorStyle awesome
+
+' アクター
+actor "照度センサー\n(VCNL4040)" as Sensor
+actor "SwitchBotデバイス" as SwitchBot
+actor "システム管理者" as Admin
+
+' メインのシステム
+rectangle "SwitchBotController" {
+  usecase "自動制御" as UC1
+  usecase "センサー値の閾値判定" as UC2
+  usecase "電気をつける" as UC3
+  usecase "電気を消す" as UC4
+  usecase "閾値設定" as UC5
+}
+
+' 関連
+Sensor --> UC1 : 照度データ提供
+Admin --> UC5 : 設定
+
+UC1 ..> UC2 : include
+UC2 ..> UC3 : extend
+UC2 ..> UC4 : extend
+
+UC3 --> SwitchBot : 実行
+UC4 --> SwitchBot : 実行
+
+' ノート
+note right of UC1
+  照度センサーから値を取得し、
+  閾値と比較して電気を自動制御
+end note
+
+note right of UC2
+  照度値 < 閾値：電気をつける
+  照度値 >= 閾値：電気を消す
+end note
+
+note bottom of UC5
+  自動制御の判断基準となる
+  閾値を設定
+end note
+
+@enduml 
