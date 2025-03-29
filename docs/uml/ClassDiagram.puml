@@ -1,50 +1,73 @@
 @startuml ClassDiagram
 skinparam linetype ortho
-' データ構造
-class InputData {
-    +int illuminance
-    +timestamp: std::chrono::time_point
+skinparam classAttributeIconSize 0
+
+' ==== ドメイン層 ====
+enum ControlMode {
+    Automatic
+    Manual
 }
 
-enum LightState {
-    ON
-    OFF
+enum ControlCommand {
+    turnOn
+    turnOff
 }
 
-' ポートインターフェース
+class ControlRequest {
+    -ControlMode mode
+    -Optional<int> sensorValue
+    -Optional<ControlCommand> command
+}
+
+ControlRequest --> ControlMode
+ControlRequest --> ControlCommand
+' ==== ポート層（Input） ====
 interface InputPort {
-    +InputData getInputData()
+    +executeRequest(ControlRequest) = 0
 }
 
 interface SwitchControlPort {
-    +LightState getCurrentState()
-    +void turnOn()
-    +void turnOff()
+    +void turnOn() = 0
+    +void turnOff() = 0
 }
 
-' ユースケースロジック
-class SwitchBotController {
+' ==== ユースケース層 ====
+class AutoSwitchControlUseCase {
     -int threshold
-    -InputPort* input
-    -SwitchControlPort* output
-
-    +void processInput()
+    -std::shared_ptr<InputPort> input
+    -std::shared_ptr<SwitchControlPort> output
+    +executeRequest(ControlRequest) override
 }
 
-SwitchBotController --> InputPort
-SwitchBotController --> SwitchControlPort
+AutoSwitchControlUseCase ..|> InputPort : impl
+AutoSwitchControlUseCase --> SwitchControlPort : uses
+AutoSwitchControlUseCase --> ControlRequest : depends
 
-' アダプター
-class SensorManager {
-    +InputData getInputData()
+' ==== アダプター層 ====
+abstract class Sensor {
+    +{abstract} SensorData getSensorData() = 0
 }
-SensorManager ..|> InputPort
+
+class VCNL4040Sensor {
+    -int i2cAddress
+    -I2CBus* bus
+    +VCNL4040Sensor(I2CBus* bus, int address)
+    +SensorData getSensorData() override
+}
+VCNL4040Sensor --|> Sensor
+
+class SensorAdapter {
+    -std::shared_ptr<Sensor> sensor
+    -std::shared_ptr<InputPort> controller
+    +SensorAdapter(std::shared_ptr<Sensor>, std::shared_ptr<InputPort>)
+}
+SensorAdapter --> Sensor : uses
+SensorAdapter --> InputPort : uses
 
 class SwitchBotApiClient {
-    +LightState getCurrentState()
-    +void turnOn()
-    +void turnOff()
+    +void turnOn() override
+    +void turnOff() override
 }
-SwitchBotApiClient ..|> SwitchControlPort
+SwitchBotApiClient ..|> SwitchControlPort : impl
 
-@enduml 
+@enduml
