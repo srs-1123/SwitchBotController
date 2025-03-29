@@ -1,0 +1,27 @@
+@startuml PackageDiagram
+skinparam linetype ortho
+package domain {
+    class SwitchBotController
+    interface InputPort
+    interface SwitchControlPort
+    class InputData
+    enum LightState
+}
+
+package adapter {
+    class SensorManager
+    class SwitchBotApiClient
+}
+
+package infra {
+    class ConfigLoader
+    class Logger
+}
+
+SensorManager ..|> domain.InputPort
+SwitchBotApiClient ..|> domain.SwitchControlPort
+
+domain.SwitchBotController --> domain.InputPort
+domain.SwitchBotController --> domain.SwitchControlPort
+
+@enduml 

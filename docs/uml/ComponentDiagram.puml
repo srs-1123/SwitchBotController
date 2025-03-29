@@ -1,0 +1,16 @@
+@startuml ComponentDiagram
+skinparam linetype ortho
+package "SwitchBotController System" {
+    
+    [SwitchBotController] as Controller
+    [InputPort] <<interface>>
+    [SwitchControlPort] <<interface>>
+    
+    [SensorManager] --> InputPort
+    Controller --> InputPort
+    
+    Controller --> SwitchControlPort
+    [SwitchBotApiClient] --> SwitchControlPort
+}
+
+@enduml 

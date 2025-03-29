@@ -1,0 +1,50 @@
+@startuml ClassDiagram
+skinparam linetype ortho
+' データ構造
+class InputData {
+    +int illuminance
+    +timestamp: std::chrono::time_point
+}
+
+enum LightState {
+    ON
+    OFF
+}
+
+' ポートインターフェース
+interface InputPort {
+    +InputData getInputData()
+}
+
+interface SwitchControlPort {
+    +LightState getCurrentState()
+    +void turnOn()
+    +void turnOff()
+}
+
+' ユースケースロジック
+class SwitchBotController {
+    -int threshold
+    -InputPort* input
+    -SwitchControlPort* output
+
+    +void processInput()
+}
+
+SwitchBotController --> InputPort
+SwitchBotController --> SwitchControlPort
+
+' アダプター
+class SensorManager {
+    +InputData getInputData()
+}
+SensorManager ..|> InputPort
+
+class SwitchBotApiClient {
+    +LightState getCurrentState()
+    +void turnOn()
+    +void turnOff()
+}
+SwitchBotApiClient ..|> SwitchControlPort
+
+@enduml 
