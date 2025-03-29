@@ -1,15 +1,18 @@
 @startuml PackageDiagram
 skinparam linetype ortho
 package domain {
-    class SwitchBotController
+    class AutoSwitchControlUseCase
     interface InputPort
     interface SwitchControlPort
-    class InputData
-    enum LightState
+    class ControlRequest
+    enum ControlMode
+    enum ControlCommand
 }
 
 package adapter {
-    class SensorManager
+    class SensorAdapter
+    class VCNL4040Sensor
+    abstract class Sensor
     class SwitchBotApiClient
 }
 
@@ -18,10 +21,17 @@ package infra {
     class Logger
 }
 
-SensorManager ..|> domain.InputPort
+SensorAdapter --> domain.InputPort : uses
 SwitchBotApiClient ..|> domain.SwitchControlPort
+VCNL4040Sensor --|> Sensor
 
-domain.SwitchBotController --> domain.InputPort
-domain.SwitchBotController --> domain.SwitchControlPort
+domain.ControlRequest --> domain.ControlMode
+domain.ControlRequest --> domain.ControlCommand
+
+domain.AutoSwitchControlUseCase ..|> domain.InputPort
+domain.AutoSwitchControlUseCase --> domain.SwitchControlPort
+domain.AutoSwitchControlUseCase --> domain.ControlRequest
+
+SensorAdapter --> Sensor
 
 @enduml 

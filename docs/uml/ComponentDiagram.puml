@@ -2,15 +2,22 @@
 skinparam linetype ortho
 package "SwitchBotController System" {
     
-    [SwitchBotController] as Controller
+    [AutoSwitchControlUseCase] as Controller
     [InputPort] <<interface>>
     [SwitchControlPort] <<interface>>
+    [Sensor] <<abstract>>
+    [VCNL4040Sensor]
+    [SensorAdapter]
+    [SwitchBotApiClient]
     
-    [SensorManager] --> InputPort
-    Controller --> InputPort
+    Controller ..|> InputPort : impl
+    SensorAdapter --> InputPort : uses
     
-    Controller --> SwitchControlPort
-    [SwitchBotApiClient] --> SwitchControlPort
+    Controller --> SwitchControlPort : uses
+    SwitchBotApiClient ..|> SwitchControlPort : impl
+    
+    VCNL4040Sensor --|> Sensor
+    SensorAdapter --> Sensor : uses
 }
 
 @enduml 
