@@ -37,12 +37,12 @@ Brightness VCNL4040Sensor::getBrightness() {
               << " (" << std::dec << raw_light << ")" << std::endl;
     
     // 0.01 lux/step変換
-    Brightness brightness = Brightness(raw_light * 0.1);
+    Brightness brightness(raw_light * 0.1f);
 
     return brightness;
 }
 
-uint16_t VCNL4040Sensor::SetALSConfig(uint8_t cmd) {
+uint16_t VCNL4040Sensor::SetAlsConfig(uint8_t cmd) {
     return writeRegister(ALS_CONF, cmd, 0x00);
 }
 

@@ -17,7 +17,7 @@ public:
     ~VCNL4040Sensor() = default;
 
     Brightness getBrightness() override;
-    uint16_t SetALSConfig(uint8_t cmd);
+    uint16_t SetAlsConfig(uint8_t cmd);
 
 private:
 #if 0
