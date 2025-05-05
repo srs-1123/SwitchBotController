@@ -19,8 +19,7 @@ public:
 
     /**
      * @brief 値を指定するコンストラクタ
-     * @param value 設定する明るさの値 (kMinBrightness <= value <= kMaxBrightness)
-     * @throw std::out_of_range 指定された値が範囲外の場合
+     * @param value 設定する明るさの値
      */
     explicit Brightness(uint8_t value);
 
