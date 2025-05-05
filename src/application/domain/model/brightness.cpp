@@ -24,7 +24,6 @@ Brightness::Brightness(const uint8_t value) {
 /**
  * @brief 明るさを設定する
  * @param value 設定する明るさの値 (0-100)
- * @throws std::invalid_argument 不正な値が指定された場合
  */
 void Brightness::setValue(const uint8_t value) {
   mValue = value;
