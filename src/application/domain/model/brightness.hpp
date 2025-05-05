@@ -21,7 +21,7 @@ public:
      * @brief 値を指定するコンストラクタ
      * @param value 設定する明るさの値
      */
-    explicit Brightness(uint8_t value);
+    explicit Brightness(float value);
 
     /**
      * @brief デストラクタ
@@ -38,21 +38,21 @@ public:
 
     /**
      * @brief 明るさの値を取得します。
-     * @return uint8_t 現在の明るさの値
+     * @return float 現在の明るさの値
      */
-    [[nodiscard]] uint8_t getValue() const noexcept;
+    [[nodiscard]] float getValue() const noexcept;
 
     /**
      * @brief 明るさの値を設定します。
      * @param value 設定する明るさの値
      */
-    void setValue(uint8_t value);
+    void setValue(float value);
 
 private:
     /**
      * @brief 明るさの値
      */
-    uint8_t mValue;
+    float mValue;
 
     };
 
