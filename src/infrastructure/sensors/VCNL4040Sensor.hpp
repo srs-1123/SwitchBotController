@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "brightness.hpp"
-#include "brightnessSensor.hpp"
+#include "../../application/domain/model/brightness.hpp"
+#include "../../application/domain/model/brightnessSensor.hpp"
 
 using domain::model::Brightness;
 using domain::model::BrightnessSensor;
@@ -17,13 +17,21 @@ public:
     ~VCNL4040Sensor() = default;
 
     Brightness getBrightness() override;
-    uint16_t SetAlsConfig(uint8_t cmd);
+    uint16_t AlsActivate();
 
 private:
 #if 0
     int fd;
 #else
-    class FileDescriptorDeleter;
+    class FileDescriptorDeleter{
+    public:
+        void operator()(int* fd) const {
+        if (*fd >= 0) {
+            close(*fd);
+        }
+        delete fd;
+        }
+    };
     std::unique_ptr<int, FileDescriptorDeleter> fd;
 #endif
 

@@ -10,26 +10,17 @@
 
 #include "VCNL4040Sensor.hpp"
 
-// デリータの実装
-class VCNL4040Sensor::FileDescriptorDeleter {
-public:
-    void operator()(int* fd) const {
-        if (*fd >= 0) {
-            close(*fd);
-        }
-        delete fd;
-    }
-};
-
 VCNL4040Sensor::VCNL4040Sensor(const char *i2c_device)
-    : fd(new int(open(i2c_device, O_RDWR)), FileDescriptorDeleter()) {
+    : fd(new int(open(i2c_device, O_RDWR)), FileDescriptorDeleter()) 
+{
     if (*fd < 0) {
         perror("Failed to open I2C device");
         throw std::runtime_error("I2C device open error");
     }
 }
 
-Brightness VCNL4040Sensor::getBrightness() {
+Brightness VCNL4040Sensor::getBrightness() 
+{
     uint16_t raw_light = readRegister(ALS_DATA);
     
     // デバッグ出力
@@ -42,11 +33,16 @@ Brightness VCNL4040Sensor::getBrightness() {
     return brightness;
 }
 
-uint16_t VCNL4040Sensor::SetAlsConfig(uint8_t cmd) {
-    return writeRegister(ALS_CONF, cmd, 0x00);
+uint16_t VCNL4040Sensor::AlsActivate() 
+{
+    constexpr uint8_t ALS_ENABLE_LSB = 0x60;
+    constexpr uint8_t ALS_ENABLE_MSB = 0x00;
+
+    return writeRegister(ALS_CONF, ALS_ENABLE_LSB, ALS_ENABLE_MSB);
 }
 
-uint16_t VCNL4040Sensor::readRegister(uint8_t reg_addr) {
+uint16_t VCNL4040Sensor::readRegister(uint8_t reg_addr)
+{
     uint8_t buffer[2];
     struct i2c_msg messages[] = {
       { I2C_ADDRESS, 0, 1, &reg_addr },      /* レジスタアドレスをセット. */
@@ -68,7 +64,8 @@ uint16_t VCNL4040Sensor::readRegister(uint8_t reg_addr) {
     return data;
 }
 
-uint16_t VCNL4040Sensor::writeRegister(uint8_t reg_addr, uint8_t lsb, uint8_t msb) {
+uint16_t VCNL4040Sensor::writeRegister(uint8_t reg_addr, uint8_t lsb, uint8_t msb) 
+{
     /* I2C-Write用のバッファを準備する. */
     uint8_t buffer[3];
     
