@@ -21,19 +21,25 @@ VCNL4040Sensor::VCNL4040Sensor(const char *i2c_device)
 
 Brightness VCNL4040Sensor::getBrightness() 
 {
-    uint16_t raw_light = readRegister(ALS_DATA);
+    static constexpr float VCNL4040_LUX_PER_STEP = 0.1f;
+    
+    auto raw_light_opt = readRegister(ALS_DATA);
+    if (!raw_light_opt) {
+        throw std::runtime_error("Failed to read ALS_DATA register");
+    }
+    uint16_t raw_light = raw_light_opt.value();
     
     // デバッグ出力
     std::cout << "Raw ALS: 0x" << std::hex << raw_light 
               << " (" << std::dec << raw_light << ")" << std::endl;
     
     // 0.01 lux/step変換
-    Brightness brightness(raw_light * 0.1f);
+    Brightness brightness(raw_light * VCNL4040_LUX_PER_STEP);
 
     return brightness;
 }
 
-uint16_t VCNL4040Sensor::AlsActivate() 
+bool VCNL4040Sensor::AlsActivate() 
 {
     constexpr uint8_t ALS_ENABLE_LSB = 0x60;
     constexpr uint8_t ALS_ENABLE_MSB = 0x00;
@@ -41,7 +47,7 @@ uint16_t VCNL4040Sensor::AlsActivate()
     return writeRegister(ALS_CONF, ALS_ENABLE_LSB, ALS_ENABLE_MSB);
 }
 
-uint16_t VCNL4040Sensor::readRegister(uint8_t reg_addr)
+std::optional<uint16_t> VCNL4040Sensor::readRegister(uint8_t reg_addr)
 {
     uint8_t buffer[2];
     struct i2c_msg messages[] = {
@@ -53,7 +59,7 @@ uint16_t VCNL4040Sensor::readRegister(uint8_t reg_addr)
     /* I2C-Readを行う. */
     if (ioctl(*fd, I2C_RDWR, &ioctl_data) < 0) {
         std::cerr << "i2c_read: failed to ioctl: " << strerror(errno) << std::endl;
-        return -1;
+        return std::nullopt;
     }
 
     // デバッグ出力
@@ -64,7 +70,7 @@ uint16_t VCNL4040Sensor::readRegister(uint8_t reg_addr)
     return data;
 }
 
-uint16_t VCNL4040Sensor::writeRegister(uint8_t reg_addr, uint8_t lsb, uint8_t msb) 
+bool VCNL4040Sensor::writeRegister(uint8_t reg_addr, uint8_t lsb, uint8_t msb) 
 {
     /* I2C-Write用のバッファを準備する. */
     uint8_t buffer[3];
@@ -80,7 +86,7 @@ uint16_t VCNL4040Sensor::writeRegister(uint8_t reg_addr, uint8_t lsb, uint8_t ms
     /* I2C-Writeを行う. */
     if (ioctl(*fd, I2C_RDWR, &ioctl_data) < 0) {
         std::cerr << "i2c_write: failed to ioctl: " << strerror(errno) << std::endl;
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
 }

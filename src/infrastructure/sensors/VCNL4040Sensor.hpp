@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <memory>
 #include "../../application/domain/model/brightness.hpp"
 #include "../../application/domain/model/brightnessSensor.hpp"
@@ -17,7 +18,7 @@ public:
     ~VCNL4040Sensor() = default;
 
     Brightness getBrightness() override;
-    uint16_t AlsActivate();
+    bool AlsActivate();
 
 private:
 #if 0
@@ -40,6 +41,6 @@ private:
     static constexpr uint8_t DEVICE_ID = 0x0C;
     static constexpr uint8_t ALS_DATA = 0x09;
 
-    uint16_t readRegister(uint8_t reg_addr);
-    uint16_t writeRegister(uint8_t reg_addr, uint8_t lsb, uint8_t msb);
+    std::optional<uint16_t> readRegister(uint8_t reg_addr);
+    bool writeRegister(uint8_t reg_addr, uint8_t lsb, uint8_t msb);
 };
