@@ -24,11 +24,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Build
-      # Build your program with the given configuration
+    - name: Build Docker image
+      run: docker build -t switchbot-dev .
+
+    - name: Build in Docker container
       run: |
-        chmod +x ./build.sh
-        ./build.sh
+        docker run --rm -v ${{ github.workspace }}:/app switchbot-dev ./build.sh
 
     # - name: Test
     #   working-directory: ${{github.workspace}}/build

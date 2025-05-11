@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# === docker環境でなければdocker runで自分自身を実行 ===
+if [ -z "$IN_DOCKER" ]; then
+  docker run --rm -e IN_DOCKER=1 -v "$(pwd)":/app -w /app switchbot-dev bash "$0" "$@"
+  exit $?
+fi
+
 # === 設定 ===
 BUILD_DIR="build"
 EXECUTABLE_NAME="SwitchBotController"
