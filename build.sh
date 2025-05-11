@@ -1,22 +1,29 @@
 #!/bin/bash
 
+# === docker環境でなければdocker runで自分自身を実行 ===
+if [ -z "$IN_DOCKER" ]; then
+  docker run --rm -e IN_DOCKER=1 -v "$(pwd)":/app -w /app switchbot-dev bash "$0" "$@"
+  exit $?
+fi
+
 # === 設定 ===
 BUILD_DIR="build"
 EXECUTABLE_NAME="SwitchBotController"
 
-# === Git タグからバージョン取得 ===
-VERSION=$(git describe --tags --abbrev=0 2>/dev/null)
-
-if [ -z "$VERSION" ]; then
-  echo "[ERROR] Git タグが存在しません。ビルドを中止します。"
-  echo "        少なくとも1つのタグ（例: git tag v1.0.0）を作成してください。"
+# === versionファイルからバージョン取得 ===
+if [ ! -f "./version" ]; then
+  echo "[ERROR] versionファイルが存在しません。ビルドを中止します。"
   exit 1
 fi
 
-# `v` を除いた純粋なバージョンに整形（例: v1.0.0 → 1.0.0）
-VERSION_CLEANED="${VERSION#v}"
+VERSION=$(cat ./version | tr -d ' \n')
 
-TARGET_DIR="target/release/$VERSION_CLEANED"
+if [ -z "$VERSION" ]; then
+  echo "[ERROR] versionファイルが空です。バージョンを記載してください。"
+  exit 1
+fi
+
+TARGET_DIR="target/release/$VERSION"
 
 # === --clean オプション ===
 if [ "$1" == "--clean" ]; then
@@ -27,7 +34,7 @@ if [ "$1" == "--clean" ]; then
   exit 0
 fi
 
-echo "[BUILD] バージョン: $VERSION_CLEANED"
+echo "[BUILD] バージョン: $VERSION"
 echo "[BUILD] 成果物出力先: $TARGET_DIR"
 
 # === 成果物ディレクトリは毎回クリーン ===
