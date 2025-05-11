@@ -6,7 +6,17 @@
 
 #include "SwitchbotAPIClient.hpp"
 
-void SwitchBotAPIClient::SendCommand(const std::string& deviceUrl, const std::string& command) {
+static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
+    userp->append(static_cast<char*>(contents), size * nmemb);
+    return size * nmemb;
+}
+
+SwitchBotAPIClient::SwitchBotAPIClient(std::string token) 
+: mToken(std::move(token)), mCurl(curl_easy_init(), curl_easy_cleanup)
+{}
+
+void SwitchBotAPIClient::SendCommand(const std::string& deviceUrl, const std::string& command) 
+{
     // JSONリクエストボディの作成
     nlohmann::json requestBody = {
         {"command", command},
