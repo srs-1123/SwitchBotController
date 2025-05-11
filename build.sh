@@ -2,6 +2,7 @@
 
 # === docker環境でなければdocker runで自分自身を実行 ===
 if [ -z "$IN_DOCKER" ]; then
+  echo "[BUILD] Entering Docker container for build environment..."
   docker run --rm -e IN_DOCKER=1 -v "$(pwd)":/app -w /app switchbot-dev bash "$0" "$@"
   exit $?
 fi
