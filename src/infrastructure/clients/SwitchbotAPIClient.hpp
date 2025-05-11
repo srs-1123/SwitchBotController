@@ -9,5 +9,5 @@ public:
     SwitchBotAPIClient();
     ~SwitchBotAPIClient() = default;
 private:
-    SendCommand(const std::string& deviceUrl, const std::string& command);
-}
+    void SendCommand(const std::string& deviceUrl, const std::string& command);
+};
