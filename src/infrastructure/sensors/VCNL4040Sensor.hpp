@@ -21,9 +21,6 @@ public:
     bool AlsActivate();
 
 private:
-#if 0
-    int fd;
-#else
     class FileDescriptorDeleter{
     public:
         void operator()(int* fd) const {
@@ -34,7 +31,6 @@ private:
         }
     };
     std::unique_ptr<int, FileDescriptorDeleter> fd;
-#endif
 
     static constexpr uint8_t ALS_CONF = 0x00;
     static constexpr uint8_t I2C_ADDRESS = 0x60;
