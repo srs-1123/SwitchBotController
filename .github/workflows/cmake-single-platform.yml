@@ -29,7 +29,7 @@ jobs:
 
     - name: Build in Docker container
       run: |
-        docker run --rm -v ${{ github.workspace }}:/app switchbot-dev ./build.sh
+        docker run --rm -e IN_DOCKER=1 -v ${{ github.workspace }}:/app switchbot-dev ./build.sh
 
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
