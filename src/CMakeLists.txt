@@ -8,7 +8,7 @@ add_library(domain_model
 # --- Domain Model ライブラリ ---
 add_library(infrastructure_lib
     infrastructure/sensors/VCNL4040Sensor.cpp
-    infrastructure/clients/SwitchBotAPIClient.cpp
+    infrastructure/clients/SwitchbotAPIClient.cpp
     # 他の infrastructure のソースファイルがあればここに追加
 )
 # ライブラリのインクルードパスを設定
